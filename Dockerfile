@@ -6,8 +6,18 @@ RUN apt-get update && apt-get install -y \
     curl \
     software-properties-common \
     git \
+    libxml2-dev \
+    libxslt1-dev \
+    libjpeg-dev \
+    zlib1g-dev \
+    libffi-dev \
+    libssl-dev \
+    python3-dev \
     && rm -rf /var/lib/apt/lists/*
+
+# Clone template (optional if you're copying your app anyway)
 RUN git clone https://github.com/streamlit/streamlit-example.git .
+COPY requirements.txt .
 COPY . .
 RUN pip3 install -r requirements.txt
 EXPOSE 8501
