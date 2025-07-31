@@ -5,7 +5,7 @@ metadata:
   labels:
     app: innews
     tags.datadoghq.com/env: dev
-    tags.datadoghq.com/service: innews
+    tags.datadoghq.com/service: InNews
     tags.datadoghq.com/version: v1
     tags.datadoghq.com/source: "python"
 spec:
@@ -18,38 +18,52 @@ spec:
       labels:
         app: innews
         tags.datadoghq.com/env: dev
-        tags.datadoghq.com/service: innews
+        tags.datadoghq.com/service: InNews
         tags.datadoghq.com/version: v1
         admission.datadoghq.com/enabled: "true"
       annotations:
         admission.datadoghq.com/python-lib.version: v2.3.1
     spec:
       containers:
-      - name: Innewsapp
-        image: 503581414038.dkr.ecr.ap-southeast-2.amazonaws.com/innewsapp-eks-ecr-demo:latest
-        ports:
-          - containerPort: 8501
-        env:
-          - name: DD_AGENT_HOST
-            valueFrom:
-              fieldRef:
-                fieldPath: status.hostIP
-          - name: DD_ENV
-            value: "dev"
-          - name: DD_VERSION
-            value: v1
-          - name: DD_LOGS_INJECTION
-            value: "true"
-          - name: DD_SERVICE
-            value: "webnodejs"
-          - name: DD_TAGS
-            value: app:nodejs,owner:sumanth,env:dev
-          - name: DD_PROFILING_ENABLED
-            value: "true"
-          - name: DD_TRACE_SAMPLE_RATE
-            value: "1"
-          - name: DD_TRACE_STARTUP_LOGS
-            value: "true"
-      	  - name: DD_RUNTIME_METRICS_ENABLED
-            value: "true"
-
+        - name: innews-app
+          image: sumanth17121988/innews-app:latest
+          ports:
+            - containerPort: 8501
+          env:
+            - name: DD_AGENT_HOST
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.hostIP
+            - name: DD_ENV
+              value: "dev"
+            - name: DD_VERSION
+              value: v1
+            - name: DD_LOGS_INJECTION
+              value: "true"
+            - name: DD_SERVICE
+              value: "InNews"
+            - name: DD_TAGS
+              value: "app:innews,owner:sumanth,env:dev"
+            - name: DD_PROFILING_ENABLED
+              value: "true"
+            - name: DD_TRACE_SAMPLE_RATE
+              value: "1"
+            - name: DD_TRACE_STARTUP_LOGS
+              value: "true"
+            - name: DD_RUNTIME_METRICS_ENABLED
+              value: "true"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: innews-service
+  labels:
+    app: innews
+spec:
+  type: LoadBalancer
+  selector:
+    app: innews
+  ports:
+    - protocol: TCP
+      port: 80           # External port
+      targetPort: 8501   # Port your Streamlit app listens on
